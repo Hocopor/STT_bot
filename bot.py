@@ -15,6 +15,12 @@ load_dotenv()
 LOG_LEVEL = os.getenv("BOT_LOG_LEVEL", "INFO")
 logging.basicConfig(level=LOG_LEVEL)
 logger = logging.getLogger("stt-test-bot")
+QUIET_LOGGERS = os.getenv(
+    "BOT_QUIET_LOGGERS",
+    "telegram,telegram.ext,httpx,apscheduler",
+)
+for name in [item.strip() for item in QUIET_LOGGERS.split(",") if item.strip()]:
+    logging.getLogger(name).setLevel(logging.WARNING)
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 STT_URL = os.getenv("STT_URL", "http://localhost:8000/stt").strip()
