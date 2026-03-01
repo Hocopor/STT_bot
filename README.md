@@ -144,6 +144,142 @@ sudo journalctl -u stt-bot -f
 
 ---
 
+## 🚀 Deploy на alwaysdata (Full Guide)
+> Alwaysdata — это **PaaS‑хостинг, не VPS**. Здесь нельзя использовать `sudo`, `apt install`, systemd‑службы и системные пакеты.  
+> Зато можно использовать `virtualenv`, а сервисы создаются через панель управления и автоматически стартуют после перезапуска.
+
+### 📌 Важно понимать
+- ❌ нет `sudo`
+- ❌ нельзя `apt install`
+- ❌ нельзя создавать `systemd`‑службы
+- ❌ нельзя ставить системные пакеты
+- ✅ можно использовать `virtualenv`
+- ✅ можно создавать сервисы через панель управления
+- ✅ сервисы автоматически запускаются после перезагрузки
+
+### 1) Подключение к серверу
+После создания аккаунта:
+- Зайти в панель управления
+- Создать SSH‑пользователя
+- Подключиться:
+```bash
+ssh username@sshX.alwaysdata.com
+```
+
+### 2) Загрузка проекта на сервер
+Вариант A — через Git (рекомендуется):
+```bash
+cd
+git clone https://github.com/yourname/yourrepo.git
+cd yourrepo
+```
+Вариант B — через SFTP:
+- Загрузить папку проекта в: `/home/username/`
+
+### 3) Проверка версии Python
+```bash
+python3 --version
+```
+Не использовать Python 3.13. Рекомендуется Python 3.11.
+Проверить доступные версии:
+```bash
+ls /usr/bin/python*
+```
+
+### 4) Создание виртуального окружения
+Удаляем старое (если есть):
+```bash
+rm -rf venv
+```
+Создаём новое:
+```bash
+python3.11 -m venv venv
+```
+Активируем:
+```bash
+source venv/bin/activate
+```
+
+### 5) Установка зависимостей
+Обновляем pip:
+```bash
+pip install --upgrade pip
+```
+Устанавливаем зависимости:
+```bash
+pip install -r requirements.txt
+```
+Если используется `.env`:
+```bash
+pip install python-dotenv
+```
+
+### 6) Проверка ручного запуска
+```bash
+python bot.py
+```
+Если бот запускается — всё настроено правильно.  
+Остановить: `CTRL+C`
+
+### 7) Работа с `.env`
+Файл `.env` должен лежать в корне проекта:
+`/home/username/yourrepo/.env`
+
+Пример:
+```env
+TELEGRAM_BOT_TOKEN=123456:ABCDEF
+STT_URL=http://localhost:8000/stt
+STT_API_KEY=your_key
+```
+
+В коде уже используется:
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+```
+
+Обязательно указать правильный `Working directory` в сервисе (см. ниже).
+
+### 8) Создание автозапуска (Service)
+Путь в панели: `Advanced → Services → Add service`
+
+Заполнить поля:
+- 🔹 `SSH user`: ваш SSH‑пользователь (например `username`)
+- 🔹 `Command`: **не использовать `source`**
+```bash
+/home/username/yourrepo/venv/bin/python /home/username/yourrepo/bot.py
+```
+- 🔹 `Working directory`:
+```text
+/home/username/yourrepo
+```
+- 🔹 `Monitoring command`: можно оставить пустым
+- 🔹 `Environment`:
+Если используется `.env` — оставить пустым.  
+Если без `.env`, можно задать:
+```text
+TELEGRAM_BOT_TOKEN=your_token_here
+```
+- 🔹 `Paused`: **не отмечать**
+- 🔹 `Annotation`: любое описание, например `Telegram bot service`
+
+### 9) После сохранения
+- Нажать `Save`
+- Убедиться, что статус `Running`
+- Проверить логи сервиса
+
+### 🔁 Автоперезапуск
+Сервис типа `Command` на alwaysdata:
+- автоматически стартует после перезагрузки сервера
+- автоматически перезапускается при падении процесса
+
+Дополнительных настроек не требуется. ✅
+
+---
+
 ## 📌 Поддерживаемые типы сообщений
 - Voice‑сообщения Telegram
 - Аудиофайлы, отправленные как `audio` или `document`
