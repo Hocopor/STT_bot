@@ -1,2 +1,5 @@
 .env
 .venv
+tmp/
+tmp/audio_CQACAgIAAxkBAAIBfGmksoSZmhAphoa4LITIPBWJW-yaAALvjgACE08pSUiNeP-ovl2uOgQ.ogg
+tmp/voice_AwACAgIAAxkBAAIBbGmkrRQeLIKDt3K1_Wj5uNv6hFprAALKjgACE08pSXp9qgjA8UMEOgQ.ogg
