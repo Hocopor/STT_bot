@@ -59,6 +59,7 @@ py -3.11 -m venv .venv
 ```
 2. Активируйте окружение:
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
 ```
 3. Установите зависимости:
